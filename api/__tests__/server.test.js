@@ -83,3 +83,30 @@ describe('[POST] /api/auth/register', () => {
     expect(res2.status).toBe(400);
   });
 });
+
+describe('[POST] /api/auth/login', () => {
+  
+  it('responds with status code 200 on successful login', async () => {
+    const res = await request(server).post('/api/auth/login').send(oldUser);
+    expect(res.status).toBe(200);
+  });
+
+  it('responds with success message and token on login', async () => {
+    const res = await request(server).post('api/auth/login').send(oldUser);
+    expect(res.body.message).toBe('successful login');
+    expect(res.body).toHaveProperty('token');
+  });
+
+  it('responds with status code 400 if username or password is missing', async () => {
+    const res1 = await request(server).post('/api/auth/login').send({ username: 'OldMan' })
+    expect(res1.status).toBe(400);
+    const res2 = await request(server).post('/api/auth/login').send({ password: 'password' })
+    expect(res2.status).toBe(400);
+  });
+
+  it('responds with status 401 on bad credentials', async () => {
+    const res1 = await request(server).post('api/auth/login').send({ username: 'OldMan', password: 'totallyFake' });
+    expect(res1.status).toBe(401);
+  });
+
+})
