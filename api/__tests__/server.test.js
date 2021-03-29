@@ -92,7 +92,7 @@ describe('[POST] /api/auth/login', () => {
   });
 
   it('responds with success message and token on login', async () => {
-    const res = await request(server).post('api/auth/login').send(oldUser);
+    const res = await request(server).post('/api/auth/login').send(oldUser);
     expect(res.body.message).toBe('successful login');
     expect(res.body).toHaveProperty('token');
   });
@@ -105,7 +105,7 @@ describe('[POST] /api/auth/login', () => {
   });
 
   it('responds with status 401 on bad credentials', async () => {
-    const res1 = await request(server).post('api/auth/login').send({ username: 'OldMan', password: 'totallyFake' });
+    const res1 = await request(server).post('/api/auth/login').send({ username: 'OldMan', password: 'totallyFake' });
     expect(res1.status).toBe(401);
   });
 

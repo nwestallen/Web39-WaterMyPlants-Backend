@@ -33,8 +33,31 @@ const checkPhoneAvailability = (req, res, next) => {
     .catch(err => next(err));
 };
 
+const checkLoginPayload = (req, res, next) => {
+    const { username, password } = req.body;
+    if(!username || !password) {
+        res.status(400).json({ message: 'username and password required' });
+    } else {
+        next();
+    }
+};
+
+const checkUserExists = (req, res, next) => {
+    User.getByUsername(req.body.username)
+    .then(user => {
+        if (!user) {
+            res.status(401).json({ message: 'invalid credentials' });
+        } else {
+            next()
+        }
+    })
+    .catch(err => next(err));
+};
+
 module.exports = {
     checkRegisterPayload,
     checkUsernameAvailability,
-    checkPhoneAvailability
+    checkPhoneAvailability,
+    checkLoginPayload,
+    checkUserExists
 };
