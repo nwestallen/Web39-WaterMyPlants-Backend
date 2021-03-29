@@ -4,6 +4,7 @@ const db = require('../data/db-config')
 const bcrypt = require('bcryptjs')
 
 const newUser = {username: 'ChuckTesta', password: '1234', phone: '330-867-5309'}
+const oldUser = {username: 'OldMan', password: 'password', phone: '444-444-4444'}
 
 beforeAll(async () => {
   await db.migrate.rollback()
@@ -33,7 +34,7 @@ describe('server.js', () => {
 //[GET] /api/auth/logout - logs user out
 //[GET] /api/users/users - returns a list of users to authenticated request
 //[GET] /api/users/user/:userid - returns user info (username, phone number)
-//[PUT] /api/user//user:userid - updates user info (phone number, password)
+//[PUT] /api/user//user/:userid - updates user info (phone number, password)
 //[GET] /api/users/user/:userid/plants - returns a list of plants to authenticated user
 //[POST] /api/plants/plant/ - adds plant to user's plants
 //[GET] /api/plants/plant/:plantid - returns plant by id
@@ -76,7 +77,9 @@ describe('[POST] /api/auth/register', () => {
   });
 
   it('responds with status code 400 if username or phone number is taken', async () => {
-    const res1 = await request(server).post('/api/auth/register').send({ username: 'ChuckTesta', phone: '123-456-7777', password: 'newpass' });
+    const res1 = await request(server).post('/api/auth/register').send({ username: 'OldMan', phone: '123-456-7777', password: 'newpass' });
     expect(res1.status).toBe(400);
+    const res2 = await request(server).post('/api/auth/register').send({ username: 'NovelThompson', phone: '444-444-4444', password: 'newpass'});
+    expect(res2.status).toBe(400);
   });
 });
