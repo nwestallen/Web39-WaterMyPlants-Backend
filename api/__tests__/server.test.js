@@ -3,7 +3,7 @@ const server = require('../server')
 const db = require('../data/db-config')
 const bcrypt = require('bcryptjs')
 
-const newUser = {user_username: 'ChuckTesta', user_password: '1234', user_phone: '330-867-5309'}
+const newUser = {username: 'ChuckTesta', password: '1234', phone: '330-867-5309'}
 
 beforeAll(async () => {
   await db.migrate.rollback()
@@ -50,33 +50,33 @@ describe('[POST] /api/auth/register', () => {
 
   it('responds with username and phone number on success', async () => {
     const res = await request(server).post('/api/auth/register').send(newUser);
-    expect(res.body).toEqual({ user_username: 'ChuckTesta', user_phone: '330-867-5309' });
+    expect(res.body).toEqual({ username: 'ChuckTesta', phone: '330-867-5309' });
   });
 
   it('adds new user to user table on success', async () => {
     await request(server).post('/api/auth/register').send(newUser);
-    const check = await db('users').where('user_username', newUser.user_username).first();
-    expect(check.user_username).toBe('ChuckTesta');
-    expect(check.user_phone).toBe('330-867-5309');
+    const check = await db('users').where('username', newUser.username).first();
+    expect(check.username).toBe('ChuckTesta');
+    expect(check.phone).toBe('330-867-5309');
   });
 
   it('encrypts user password in database', async () => {
     await request(server).post('/api/auth/register').send(newUser);
-    const check = await db('users').where('user_username', newUser.user_username).first();
-    expect(bcrypt.compareSync(newUser.user_password, check.user_password)).toBeTruthy();
+    const check = await db('users').where('username', newUser.username).first();
+    expect(bcrypt.compareSync(newUser.password, check.password)).toBeTruthy();
   });
 
   it('responds with status code 400 if username, password, or phone number is missing', async () => {
-    const res1 = await request(server).post('/api/auth/register').send({ user_username: 'NoPassword', user_phone: '555-555-5555' });
+    const res1 = await request(server).post('/api/auth/register').send({ username: 'NoPassword', phone: '555-555-5555' });
     expect(res1.status).toBe(400);
-    const res2 = await request(server).post('/api/auth/register').send({ user_username: 'NoPhone', user_password: 'password' });
+    const res2 = await request(server).post('/api/auth/register').send({ username: 'NoPhone', password: 'password' });
     expect(res2.status).toBe(400);
-    const res3 = await request(server).post('/api/auth/register').send({ user_password: 'NoUser', user_phone: '555-555-5555' });
+    const res3 = await request(server).post('/api/auth/register').send({ password: 'NoUser', phone: '555-555-5555' });
     expect(res3.status).toBe(400);
   });
 
   it('responds with status code 400 if username or phone number is taken', async () => {
-    const res1 = await request(server).post('/api/auth/register').send({ user_username: 'ChuckTesta', user_phone: '123-456-7777', user_password: 'newpass' });
+    const res1 = await request(server).post('/api/auth/register').send({ username: 'ChuckTesta', phone: '123-456-7777', password: 'newpass' });
     expect(res1.status).toBe(400);
   });
 });

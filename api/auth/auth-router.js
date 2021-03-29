@@ -5,9 +5,9 @@ const User = require('../users/users-model');
 const router = express.Router();
 
 router.post('/register', (req, res) => {
-    const { user_username, user_password, user_phone } = req.body;
-    const hash = bcrypt.hashSync(user_password, 8);
-    User.add({ user_username, user_password: hash, user_phone })
+    const { username, password, phone } = req.body;
+    const hash = bcrypt.hashSync(password, 8);
+    User.add({ username, password: hash, phone })
       .then(user => {
         res.status(201).json(user[0])
     })

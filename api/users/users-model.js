@@ -13,7 +13,7 @@ const getByUsername = (username) => {
 };
 
 const add = async user => {
-    return await db('users').insert(user, ['user_username', 'user_phone'])
+    return await db('users').insert(user, ['username', 'phone'])
 };
 
 module.exports = {
