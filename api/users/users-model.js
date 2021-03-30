@@ -18,7 +18,7 @@ const getByPhone = (phonenumber) => {
 };
 
 const add = async user => {
-    return await db('users').insert(user, ['username', 'phonenumber'])
+    return await db('users').insert(user, ['userid', 'username', 'phonenumber'])
 };
 
 const update = async user => {
