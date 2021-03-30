@@ -5,6 +5,10 @@ const bcrypt = require('bcryptjs')
 
 const newUser = {username: 'ChuckTesta', password: '1234', phone: '330-867-5309'}
 const oldUser = {username: 'OldMan', password: 'password', phone: '444-444-4444'}
+const plantData = [
+  {"h2oFrequency": "7", "nickname": "steve", "plantid": 1, "species": "aloe vera", "userid": 1}, 
+  {"h2oFrequency": "4", "nickname": "rubber plant", "plantid": 2, "species": "ficus elastica", "userid": 1}
+]
 
 beforeAll(async () => {
   await db.migrate.rollback()
@@ -29,13 +33,13 @@ describe('server.js', () => {
 })
 
 //---------------------------- ENDPOINTS ------------------------------
-//[POST] /api/auth/register - registers a user with hashed password
-//[POST] /api/auth/login - authenticates user and returns a token
+//[POST] /api/auth/register - registers a user with hashed password X
+//[POST] /api/auth/login - authenticates user and returns a token X
 //[GET] /api/auth/logout - logs user out
-//[GET] /api/users/users - returns a list of users to authenticated request
-//[GET] /api/users/user/:userid - returns user info (username, phone number)
+//[GET] /api/users/users - returns a list of users to authenticated request X
+//[GET] /api/users/user/:userid - returns user info (username, phone number) X
 //[PUT] /api/user//user/:userid - updates user info (phone number, password)
-//[GET] /api/users/user/:userid/plants - returns a list of plants to authenticated user
+//[GET] /api/users/user/:userid/plants - returns a list of plants to authenticated user X
 //[POST] /api/plants/plant/ - adds plant to user's plants
 //[GET] /api/plants/plant/:plantid - returns plant by id
 //[GET] /api/plants/plants - get all plants (for all users) straight up all of them
@@ -107,6 +111,55 @@ describe('[POST] /api/auth/login', () => {
   it('responds with status 401 on bad credentials', async () => {
     const res1 = await request(server).post('/api/auth/login').send({ username: 'OldMan', password: 'totallyFake' });
     expect(res1.status).toBe(401);
+  });
+
+})
+
+describe('[GET] /api/users/users', () => {
+
+  it('responds with status 200', async () => {
+    const res = await request(server).get('/api/users/users');
+    expect(res.status).toBe(200);
+  });
+
+  it('responds with array of users', async () => {
+    const res = await request(server).get('/api/users/users');
+    expect(res.body).toEqual([]);
+  });
+
+})
+
+describe('[GET] /api/users/user/:id', () => {
+
+  it('responds with status 200 on success', async () => {
+    const res = await request(server).get('/api/users/user/1');
+    expect(res.status).toBe(200);
+  });
+
+  it('responds with user info', async () => {
+    const res = await request(server).get('/api/users/user/1');
+    expect(res.body).toBe(200);
+  });
+});
+
+describe('[PUT] /api/users/user/:id', () => {
+
+  it('updates username and password on success', async () => {
+    const res = await request(server).put('/api/users/user/1').send();
+    expect(res).toBe(false);
+  });
+});
+
+describe('[GET] /api/users/user/:id/plants', () => {
+  
+  it('responds with status 200 on success', async () => {
+    const res = await request(server).get('/api/users/user/1/plants');
+    expect(res.status).toBe(200);
+  });
+
+  it('responds with array of users plants', async () => {
+    const res = await request(server).get('/api/users/user/1/plants');
+    expect(res.body).toEqual(plantData);
   });
 
 })
