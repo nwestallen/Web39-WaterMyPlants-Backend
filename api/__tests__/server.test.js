@@ -117,13 +117,28 @@ describe('[POST] /api/auth/login', () => {
 
 describe('[GET] /api/users/users', () => {
 
-  it('responds with status 200', async () => {
+  it('responds appropriately when token is missing', async () => {
     const res = await request(server).get('/api/users/users');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe('token required');
+  });
+ 
+  it('responds appropriately when token is expired/invalid', async () => {
+    const res = await request(server).get('/api/users/users').set('Authorization', 'badToken');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe('token invalid');
+  });
+  
+
+  it('responds with status 200', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/users/users').set('Authorization', login.body.token);
     expect(res.status).toBe(200);
   });
 
   it('responds with array of users', async () => {
-    const res = await request(server).get('/api/users/users');
+    const login = await request(server).post('/api/auth/login').send(oldUser)
+    const res = await request(server).get('/api/users/users').set('Authorization', login.body.token);
     expect(res.body).toEqual([]);
   });
 
@@ -131,34 +146,78 @@ describe('[GET] /api/users/users', () => {
 
 describe('[GET] /api/users/user/:id', () => {
 
-  it('responds with status 200 on success', async () => {
+  it('responds appropriately when token is missing', async () => {
     const res = await request(server).get('/api/users/user/1');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe('token required');
+  });
+ 
+  it('responds appropriately when token is expired/invalid', async () => {
+    const res = await request(server).get('/api/users/user/1').set('Authorization', 'badToken');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe('token invalid');
+  });
+
+  it('responds with status 200 on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/users/user/1').set('Authorization', login.body.token);
     expect(res.status).toBe(200);
   });
 
   it('responds with user info', async () => {
-    const res = await request(server).get('/api/users/user/1');
-    expect(res.body).toBe(200);
+    const login = await request(server).post('/api/auth/login').send(oldUser)
+    const res = await request(server).get('/api/users/user/1').set('Authorization', login.body.token);
+    expect(res.body).toBe([]);
   });
 });
 
 describe('[PUT] /api/users/user/:id', () => {
 
-  it('updates username and password on success', async () => {
-    const res = await request(server).put('/api/users/user/1').send();
-    expect(res).toBe(false);
+  it('responds appropriately when token is missing', async () => {
+    const res = await request(server).put('/api/users/user/1');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe('token required');
   });
+ 
+  it('responds appropriately when token is expired/invalid', async () => {
+    const res = await request(server).put('/api/users/user/1').set('Authorization', 'badToken');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe('token invalid');
+  });
+
+  it('updates username and password on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser)
+    await request(server).put('/api/users/user/1').send({username: 'newName', password: '33333'}).set('Authorization', login.body.token);
+    const check = await db('users').where('userid', 1).first();
+    expect(check.username).toBe('newName');
+    expect(bcrypt.compareSync(check.password, '33333')).toBeTruthy();
+  });
+
 });
 
 describe('[GET] /api/users/user/:id/plants', () => {
+
+  it('responds appropriately when token is missing', async () => {
+    const res = await request(server).get('/api/users/user/1/plants');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe('token required');
+  });
+ 
+  it('responds appropriately when token is expired/invalid', async () => {
+    const res = await request(server).get('/api/users/user/1/plants').set('Authorization', 'badToken');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe('token invalid');
+  });
   
   it('responds with status 200 on success', async () => {
-    const res = await request(server).get('/api/users/user/1/plants');
+    const login = await request(server).post('/api/auth/login').send(oldUser)
+    const res = await request(server).get('/api/users/user/1/plants').set('Authorization', login.body.token);
     expect(res.status).toBe(200);
   });
 
   it('responds with array of users plants', async () => {
-    const res = await request(server).get('/api/users/user/1/plants');
+    const login = await request(server).post('/api/auth/login').send(oldUser)
+    const res = await request(server).get('/api/users/user/1/plants').set('Authorization', login.body.token);
     expect(res.body).toEqual(plantData);
   });
 
