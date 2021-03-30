@@ -200,7 +200,7 @@ describe('[PUT] /api/users/user/:id', () => {
 
   it('updates username and password on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
-    await request(server).put('/api/users/user/1').send({username: 'newName', password: 'test', userid: 1, phonenumber: '444-444-4444'}).set('Authorization', login.body.token);
+    await request(server).put('/api/users/user/1').send({username: 'newName', password: 'test'}).set('Authorization', login.body.token);
     const check = await db('users').where('userid', 1).first();
     expect(check.username).toBe('newName');
     expect(bcrypt.compareSync('test', check.password)).toBeTruthy();

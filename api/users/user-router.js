@@ -23,7 +23,8 @@ router.get('/user/:id', checkUserId, (req, res) => {
 });
 
 router.put('/user/:id', checkUserId, (req, res) => {
-    User.update(req.body)
+    const userid = req.params.id;
+    User.update({...req.body, userid})
     .then(() => {
         res.json({ message: 'user info successfully updated' });
     })
