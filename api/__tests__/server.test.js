@@ -38,7 +38,7 @@ describe('server.js', () => {
 //[GET] /api/auth/logout - logs user out
 //[GET] /api/users/users - returns a list of users to authenticated request X
 //[GET] /api/users/user/:userid - returns user info (username, phone number) X
-//[PUT] /api/user//user/:userid - updates user info (phone number, password)
+//[PUT] /api/user//user/:userid - updates user info (phone number, password) X
 //[GET] /api/users/user/:userid/plants - returns a list of plants to authenticated user X
 //[POST] /api/plants/plant/ - adds plant to user's plants
 //[GET] /api/plants/plant/:plantid - returns plant by id
@@ -258,4 +258,87 @@ describe('[GET] /api/users/user/:id/plants', () => {
     expect(res.body.message).toBe('user with id 9 not found'); 
   });
 
-})
+});
+
+describe('[GET] /api/plants/plants', () => {
+
+  it('responds with status code 200 on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/plants/plants').set('Authorization', login.body.token);
+    expect(res.status).toBe(200);
+  });
+
+  it('responds with array of plants on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/plants/plants').set('Authorization', login.body.token);
+    expect(res.body).toEqual(plantData);
+  });
+
+});
+
+describe('[GET] /api/plants/plant/:plantid', () => {
+
+  it('responds with status code 200 on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/plants/plant/1').set('Authorization', login.body.token);
+    expect(res.status).toBe(200);
+  });
+
+  it('responds with plant info on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/plants/plant/1').set('Authorization', login.body.token);
+    expect(res.body).toEqual(plantData);
+  });
+
+});
+
+describe('[POST] /api/plants/plant/', () => {
+
+  it('responds with status code 200 on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).post('/api/plants/plant').set('Authorization', login.body.token);
+    expect(res.status).toBe(200);
+  });
+
+  it('adds plant to plants table on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    await request(server).post('/api/plants/plant').set('Authorization', login.body.token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test', userid: 1 });
+    const check = await db('plants').where('plantid', 3).first();
+    expect(check.nickname).toBe('newPlant');
+  });
+
+});
+
+describe('[PUT], /api/plants/plant/:plantid', () => {
+
+  it('responds with status code 200 on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.token).send({...plantData[0], nickname: 'newName'});
+    expect(res.status).toBe(200);
+  });
+
+  it('updates plant info on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    await request(server).post('/api/plants/plant/1').set('Authorization', login.body.token).send({...plantData[0], nickname: 'newName'});
+    const check = await db('plants').where('plantid', 1).first()
+    expect(check.nickname).toBe('newName');
+  });
+
+});
+
+describe('[DELETE], /api/plants/plant/:plantid', () => {
+
+  it('responds with status code 200 on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).delete('/api/plants/plant/1').set('Authorization', login.body.token);
+    expect(res.status).toBe(200);
+  });
+
+  it('deletes plant from plants table on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    await request(server).delete('/api/plants/plant/1').set('Authorization', login.body.token);
+    const check = await db('plants')
+    expect(check.length).toBe(1);
+  });
+
+});

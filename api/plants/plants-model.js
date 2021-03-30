@@ -4,6 +4,10 @@ const getAll = () => {
     return db('plants');    
 };
 
+const getById = (plantid) => {
+    return Promise(null);
+}
+
 const getUserPlants = (userid) => {
     return db('plants').where({ userid }); 
 };
