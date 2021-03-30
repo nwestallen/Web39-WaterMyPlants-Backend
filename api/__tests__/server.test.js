@@ -139,7 +139,7 @@ describe('[GET] /api/users/users', () => {
   it('responds with array of users', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
     const res = await request(server).get('/api/users/users').set('Authorization', login.body.token);
-    expect(res.body).toEqual([]);
+    expect(res.body).toEqual([{ username: 'OldMan', phone: '444-444-4444', userid: 1 }]);
   });
 
 })
@@ -165,10 +165,23 @@ describe('[GET] /api/users/user/:id', () => {
   });
 
   it('responds with user info', async () => {
-    const login = await request(server).post('/api/auth/login').send(oldUser)
+    const login = await request(server).post('/api/auth/login').send(oldUser);
     const res = await request(server).get('/api/users/user/1').set('Authorization', login.body.token);
-    expect(res.body).toBe([]);
+    expect(res.body).toEqual({username: 'OldMan', phone: '444-444-4444'});
   });
+
+  it('responds with status 400 if userid not found', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/users/user/9').set('Authorization', login.body.token);
+    expect(res.status).toBe(400); 
+  })
+
+  it('responds with proper message if userid not found', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/users/user/9').set('Authorization', login.body.token);
+    expect(res.body.message).toBe('user with id 9 not found'); 
+  });
+
 });
 
 describe('[PUT] /api/users/user/:id', () => {
@@ -187,10 +200,22 @@ describe('[PUT] /api/users/user/:id', () => {
 
   it('updates username and password on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
-    await request(server).put('/api/users/user/1').send({username: 'newName', password: '33333'}).set('Authorization', login.body.token);
+    await request(server).put('/api/users/user/1').send({username: 'newName', password: 'test', userid: 1, phone: '444-444-4444'}).set('Authorization', login.body.token);
     const check = await db('users').where('userid', 1).first();
     expect(check.username).toBe('newName');
-    expect(bcrypt.compareSync(check.password, '33333')).toBeTruthy();
+    expect(bcrypt.compareSync('test', check.password)).toBeTruthy();
+  });
+
+  it('responds with status 400 if userid not found', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).put('/api/users/user/9').set('Authorization', login.body.token);
+    expect(res.status).toBe(400); 
+  })
+
+  it('responds with proper message if userid not found', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).put('/api/users/user/9').set('Authorization', login.body.token);
+    expect(res.body.message).toBe('user with id 9 not found'); 
   });
 
 });
@@ -219,6 +244,18 @@ describe('[GET] /api/users/user/:id/plants', () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
     const res = await request(server).get('/api/users/user/1/plants').set('Authorization', login.body.token);
     expect(res.body).toEqual(plantData);
+  });
+
+  it('responds with status 400 if userid not found', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/users/user/9/plants').set('Authorization', login.body.token);
+    expect(res.status).toBe(400); 
+  })
+
+  it('responds with proper message if userid not found', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/users/user/9/plants').set('Authorization', login.body.token);
+    expect(res.body.message).toBe('user with id 9 not found'); 
   });
 
 })

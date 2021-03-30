@@ -5,7 +5,6 @@ const getAll = () => {
 };
 
 const getUserPlants = (userid) => {
-    console.log(userid)
     return db('plants').where({ userid }); 
 };
 

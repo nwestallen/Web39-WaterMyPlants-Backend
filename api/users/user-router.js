@@ -1,6 +1,7 @@
 const express = require('express');
 const User = require('./users-model');
 const Plant = require('../plants/plants-model');
+const { checkUserId } = require('../middleware/users-middleware');
 
 const router = express.Router();
 
@@ -12,16 +13,26 @@ router.get('/users', (req, res) => {
     .catch(err => res.status(500).json({ message: err.message }))
 });
 
-router.get('user/:id', (req, res) => {
+router.get('/user/:id', checkUserId, (req, res) => {
     const userid = req.params.id 
     User.getById(userid)
     .then(user => {
-        res.json(user);
+        res.json({ username: user.username, phone: user.phone });
     })
     .catch(err => res.status(500).json({ message: err.message }));
 });
 
-router.get('/user/:id/plants', (req, res) => {
+router.put('/user/:id', checkUserId, (req, res) => {
+    User.update(req.body)
+    .then(() => {
+        res.json({ message: 'user info successfully updated' });
+    })
+    .catch(err => {
+        res.status(500).json({ message: err.message })
+    })
+})
+
+router.get('/user/:id/plants', checkUserId, (req, res) => {
     const userid = req.params.id;
     Plant.getUserPlants(userid)
     .then(plants => {

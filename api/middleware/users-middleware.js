@@ -54,10 +54,24 @@ const checkUserExists = (req, res, next) => {
     .catch(err => next(err));
 };
 
+const checkUserId = (req, res, next) => {
+    User.getById(req.params.id)
+    .then(user => {
+        if (!user) {
+            res.status(400).json({ message: `user with id ${req.params.id} not found`})
+        }
+        else {
+            next();
+        }
+    })
+    .catch(err => next(err));
+};
+
 module.exports = {
     checkRegisterPayload,
     checkUsernameAvailability,
     checkPhoneAvailability,
     checkLoginPayload,
-    checkUserExists
+    checkUserExists,
+    checkUserId
 };
