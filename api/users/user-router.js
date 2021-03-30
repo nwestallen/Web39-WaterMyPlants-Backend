@@ -17,7 +17,7 @@ router.get('/user/:id', checkUserId, (req, res) => {
     const userid = req.params.id 
     User.getById(userid)
     .then(user => {
-        res.json({ username: user.username, phone: user.phone });
+        res.json({ username: user.username, phonenumber: user.phonenumber });
     })
     .catch(err => res.status(500).json({ message: err.message }));
 });

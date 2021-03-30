@@ -4,7 +4,7 @@ exports.up = async (knex) => {
       users.increments('userid')
       users.string('username', 200).notNullable()
       users.string('password', 200).notNullable()
-      users.string('phone', 200).notNullable()
+      users.string('phonenumber', 200).notNullable()
       users.timestamps(false, true)
     })
     .createTable('plants', (plants) => {

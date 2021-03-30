@@ -3,8 +3,8 @@ const server = require('../server')
 const db = require('../data/db-config')
 const bcrypt = require('bcryptjs')
 
-const newUser = {username: 'ChuckTesta', password: '1234', phone: '330-867-5309'}
-const oldUser = {username: 'OldMan', password: 'password', phone: '444-444-4444'}
+const newUser = {username: 'ChuckTesta', password: '1234', phonenumber: '330-867-5309'}
+const oldUser = {username: 'OldMan', password: 'password', phonenumber: '444-444-4444'}
 const plantData = [
   {"h2oFrequency": "7", "nickname": "steve", "plantid": 1, "species": "aloe vera", "userid": 1}, 
   {"h2oFrequency": "4", "nickname": "rubber plant", "plantid": 2, "species": "ficus elastica", "userid": 1}
@@ -33,18 +33,18 @@ describe('server.js', () => {
 })
 
 //---------------------------- ENDPOINTS ------------------------------
-//[POST] /api/auth/register - registers a user with hashed password X
-//[POST] /api/auth/login - authenticates user and returns a token X
+//[POST] /api/auth/register - registers a user with hashed password XX
+//[POST] /api/auth/login - authenticates user and returns a token XX
 //[GET] /api/auth/logout - logs user out
-//[GET] /api/users/users - returns a list of users to authenticated request X
-//[GET] /api/users/user/:userid - returns user info (username, phone number) X
-//[PUT] /api/user//user/:userid - updates user info (phone number, password) X
-//[GET] /api/users/user/:userid/plants - returns a list of plants to authenticated user X
-//[POST] /api/plants/plant/ - adds plant to user's plants
-//[GET] /api/plants/plant/:plantid - returns plant by id
-//[GET] /api/plants/plants - get all plants (for all users) straight up all of them
-//[PUT] /api/plants/plant/:plantid - updates plant with given id
-//[DELETE] /api/plants/plant/:plantid - deletes plant with given id
+//[GET] /api/users/users - returns a list of users to authenticated request XX
+//[GET] /api/users/user/:userid - returns user info (username, phonenumber) XX
+//[PUT] /api/user//user/:userid - updates user info (phonenumber, password) XX
+//[GET] /api/users/user/:userid/plants - returns a list of plants to authenticated user XX
+//[POST] /api/plants/plant/ - adds plant to user's plants XX
+//[GET] /api/plants/plant/:plantid - returns plant by id XX
+//[GET] /api/plants/plants - get all plants (for all users) straight up all of them XX
+//[PUT] /api/plants/plant/:plantid - updates plant with given id XX
+//[DELETE] /api/plants/plant/:plantid - deletes plant with given id X
 
 describe('[POST] /api/auth/register', () => {
 
@@ -53,16 +53,16 @@ describe('[POST] /api/auth/register', () => {
     expect(res.status).toBe(201);
   });
 
-  it('responds with username and phone number on success', async () => {
+  it('responds with username and phonenumber on success', async () => {
     const res = await request(server).post('/api/auth/register').send(newUser);
-    expect(res.body).toEqual({ username: 'ChuckTesta', phone: '330-867-5309' });
+    expect(res.body).toEqual({ username: 'ChuckTesta', phonenumber: '330-867-5309' });
   });
 
   it('adds new user to user table on success', async () => {
     await request(server).post('/api/auth/register').send(newUser);
     const check = await db('users').where('username', newUser.username).first();
     expect(check.username).toBe('ChuckTesta');
-    expect(check.phone).toBe('330-867-5309');
+    expect(check.phonenumber).toBe('330-867-5309');
   });
 
   it('encrypts user password in database', async () => {
@@ -71,19 +71,19 @@ describe('[POST] /api/auth/register', () => {
     expect(bcrypt.compareSync(newUser.password, check.password)).toBeTruthy();
   });
 
-  it('responds with status code 400 if username, password, or phone number is missing', async () => {
-    const res1 = await request(server).post('/api/auth/register').send({ username: 'NoPassword', phone: '555-555-5555' });
+  it('responds with status code 400 if username, password, or phonenumber is missing', async () => {
+    const res1 = await request(server).post('/api/auth/register').send({ username: 'NoPassword', phonenumber: '555-555-5555' });
     expect(res1.status).toBe(400);
     const res2 = await request(server).post('/api/auth/register').send({ username: 'NoPhone', password: 'password' });
     expect(res2.status).toBe(400);
-    const res3 = await request(server).post('/api/auth/register').send({ password: 'NoUser', phone: '555-555-5555' });
+    const res3 = await request(server).post('/api/auth/register').send({ password: 'NoUser', phonenumber: '555-555-5555' });
     expect(res3.status).toBe(400);
   });
 
-  it('responds with status code 400 if username or phone number is taken', async () => {
-    const res1 = await request(server).post('/api/auth/register').send({ username: 'OldMan', phone: '123-456-7777', password: 'newpass' });
+  it('responds with status code 400 if username or phonenumber is taken', async () => {
+    const res1 = await request(server).post('/api/auth/register').send({ username: 'OldMan', phonenumber: '123-456-7777', password: 'newpass' });
     expect(res1.status).toBe(400);
-    const res2 = await request(server).post('/api/auth/register').send({ username: 'NovelThompson', phone: '444-444-4444', password: 'newpass'});
+    const res2 = await request(server).post('/api/auth/register').send({ username: 'NovelThompson', phonenumber: '444-444-4444', password: 'newpass'});
     expect(res2.status).toBe(400);
   });
 });
@@ -139,7 +139,7 @@ describe('[GET] /api/users/users', () => {
   it('responds with array of users', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
     const res = await request(server).get('/api/users/users').set('Authorization', login.body.token);
-    expect(res.body).toEqual([{ username: 'OldMan', phone: '444-444-4444', userid: 1 }]);
+    expect(res.body).toEqual([{ username: 'OldMan', phonenumber: '444-444-4444', userid: 1 }]);
   });
 
 })
@@ -167,7 +167,7 @@ describe('[GET] /api/users/user/:id', () => {
   it('responds with user info', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
     const res = await request(server).get('/api/users/user/1').set('Authorization', login.body.token);
-    expect(res.body).toEqual({username: 'OldMan', phone: '444-444-4444'});
+    expect(res.body).toEqual({username: 'OldMan', phonenumber: '444-444-4444'});
   });
 
   it('responds with status 400 if userid not found', async () => {
@@ -200,7 +200,7 @@ describe('[PUT] /api/users/user/:id', () => {
 
   it('updates username and password on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
-    await request(server).put('/api/users/user/1').send({username: 'newName', password: 'test', userid: 1, phone: '444-444-4444'}).set('Authorization', login.body.token);
+    await request(server).put('/api/users/user/1').send({username: 'newName', password: 'test', userid: 1, phonenumber: '444-444-4444'}).set('Authorization', login.body.token);
     const check = await db('users').where('userid', 1).first();
     expect(check.username).toBe('newName');
     expect(bcrypt.compareSync('test', check.password)).toBeTruthy();

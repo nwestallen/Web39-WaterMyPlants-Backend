@@ -1,9 +1,9 @@
 const User = require('../users/users-model');
 
 const checkRegisterPayload = (req, res, next) => {
-    const { username, password, phone } = req.body;
-    if(!username || !password || !phone) {
-        res.status(400).json({ message: 'username, password, and phone are required' });
+    const { username, password, phonenumber } = req.body;
+    if(!username || !password || !phonenumber) {
+        res.status(400).json({ message: 'username, password, and phonenumber are required' });
     } else {
         next();
     }
@@ -22,10 +22,10 @@ const checkUsernameAvailability = (req, res, next) => {
 };
 
 const checkPhoneAvailability = (req, res, next) => {
-    User.getByPhone(req.body.phone)
+    User.getByPhone(req.body.phonenumber)
     .then(user => {
         if (user) {
-            res.status(400).json({ message: 'phone number is already taken' });
+            res.status(400).json({ message: 'phonenumber is already taken' });
         } else {
             next();
         }
