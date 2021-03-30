@@ -287,7 +287,7 @@ describe('[GET] /api/plants/plant/:plantid', () => {
   it('responds with plant info on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
     const res = await request(server).get('/api/plants/plant/1').set('Authorization', login.body.token);
-    expect(res.body).toEqual(plantData);
+    expect(res.body).toEqual(plantData[0]);
   });
 
 });
@@ -296,7 +296,7 @@ describe('[POST] /api/plants/plant/', () => {
 
   it('responds with status code 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).post('/api/plants/plant').set('Authorization', login.body.token);
+    const res = await request(server).post('/api/plants/plant').set('Authorization', login.body.token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test', userid: 1 });
     expect(res.status).toBe(200);
   });
 
@@ -313,13 +313,13 @@ describe('[PUT], /api/plants/plant/:plantid', () => {
 
   it('responds with status code 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.token).send({...plantData[0], nickname: 'newName'});
+    const res = await request(server).put('/api/plants/plant/1').set('Authorization', login.body.token).send({...plantData[0], nickname: 'newName'});
     expect(res.status).toBe(200);
   });
 
   it('updates plant info on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    await request(server).post('/api/plants/plant/1').set('Authorization', login.body.token).send({...plantData[0], nickname: 'newName'});
+    await request(server).put('/api/plants/plant/1').set('Authorization', login.body.token).send({...plantData[0], nickname: 'newName'});
     const check = await db('plants').where('plantid', 1).first()
     expect(check.nickname).toBe('newName');
   });
