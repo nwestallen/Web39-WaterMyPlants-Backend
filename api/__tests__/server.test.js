@@ -319,7 +319,7 @@ describe('[PUT], /api/plants/plant/:plantid', () => {
 
   it('updates plant info on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    await request(server).put('/api/plants/plant/1').set('Authorization', login.body.token).send({...plantData[0], nickname: 'newName'});
+    await request(server).put('/api/plants/plant/1').set('Authorization', login.body.token).send({nickname: 'newName'});
     const check = await db('plants').where('plantid', 1).first()
     expect(check.nickname).toBe('newName');
   });

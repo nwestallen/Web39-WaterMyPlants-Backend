@@ -30,12 +30,13 @@ router.post('/plant', (req, res) => {
 });
 
 router.put('/plant/:plantid', (req, res) => {
-    Plant.update(req.body)
+    const { plantid } = req.params;
+    
+    Plant.update({...req.body, plantid})
     .then(plant => {
         res.json(plant);
     })
     .catch(err => { 
-        console.log(err);
         res.status(500).json({ message: err.message })
     });
 });
