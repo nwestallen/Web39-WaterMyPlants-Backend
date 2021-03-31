@@ -47,7 +47,7 @@ router.get('/logout', (req, res) => {
 function buildToken(user) {
   const payload = {
     subject: user.user_id,
-    username: user.username
+    user
   };
   const config = {
     expiresIn: '40min'
