@@ -98,7 +98,7 @@ describe('[POST] /api/auth/login', () => {
   it('responds with success message and token on login', async () => {
     const res = await request(server).post('/api/auth/login').send(oldUser);
     expect(res.body.message).toBe('successful login');
-    expect(res.body).toHaveProperty('token');
+    expect(res.body).toHaveProperty('access_token');
   });
 
   it('responds with status code 400 if username or password is missing', async () => {
@@ -132,13 +132,13 @@ describe('[GET] /api/users/users', () => {
 
   it('responds with status 200', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/users/users').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/users').set('Authorization', login.body.access_token);
     expect(res.status).toBe(200);
   });
 
   it('responds with array of users', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
-    const res = await request(server).get('/api/users/users').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/users').set('Authorization', login.body.access_token);
     expect(res.body).toEqual([{ username: 'OldMan', phonenumber: '444-444-4444', userid: 1 }]);
   });
 
@@ -160,25 +160,25 @@ describe('[GET] /api/users/user/:id', () => {
 
   it('responds with status 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/users/user/1').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/user/1').set('Authorization', login.body.access_token);
     expect(res.status).toBe(200);
   });
 
   it('responds with user info', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/users/user/1').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/user/1').set('Authorization', login.body.access_token);
     expect(res.body).toEqual({username: 'OldMan', phonenumber: '444-444-4444'});
   });
 
   it('responds with status 400 if userid not found', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/users/user/9').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/user/9').set('Authorization', login.body.access_token);
     expect(res.status).toBe(400); 
   })
 
   it('responds with proper message if userid not found', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/users/user/9').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/user/9').set('Authorization', login.body.access_token);
     expect(res.body.message).toBe('user with id 9 not found'); 
   });
 
@@ -200,7 +200,7 @@ describe('[PUT] /api/users/user/:id', () => {
 
   it('updates username and password on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
-    await request(server).put('/api/users/user/1').send({username: 'newName'}).set('Authorization', login.body.token);
+    await request(server).put('/api/users/user/1').send({username: 'newName'}).set('Authorization', login.body.access_token);
     const check = await db('users').where('userid', 1).first();
     expect(check.username).toBe('newName');
     expect(bcrypt.compareSync('password', check.password)).toBeTruthy();
@@ -208,13 +208,13 @@ describe('[PUT] /api/users/user/:id', () => {
 
   it('responds with status 400 if userid not found', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).put('/api/users/user/9').set('Authorization', login.body.token);
+    const res = await request(server).put('/api/users/user/9').set('Authorization', login.body.access_token);
     expect(res.status).toBe(400); 
   })
 
   it('responds with proper message if userid not found', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).put('/api/users/user/9').set('Authorization', login.body.token);
+    const res = await request(server).put('/api/users/user/9').set('Authorization', login.body.access_token);
     expect(res.body.message).toBe('user with id 9 not found'); 
   });
 
@@ -236,25 +236,25 @@ describe('[GET] /api/users/user/:id/plants', () => {
   
   it('responds with status 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
-    const res = await request(server).get('/api/users/user/1/plants').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/user/1/plants').set('Authorization', login.body.access_token);
     expect(res.status).toBe(200);
   });
 
   it('responds with array of users plants', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
-    const res = await request(server).get('/api/users/user/1/plants').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/user/1/plants').set('Authorization', login.body.access_token);
     expect(res.body).toEqual(plantData);
   });
 
   it('responds with status 400 if userid not found', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/users/user/9/plants').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/user/9/plants').set('Authorization', login.body.access_token);
     expect(res.status).toBe(400); 
   })
 
   it('responds with proper message if userid not found', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/users/user/9/plants').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/users/user/9/plants').set('Authorization', login.body.access_token);
     expect(res.body.message).toBe('user with id 9 not found'); 
   });
 
@@ -264,13 +264,13 @@ describe('[GET] /api/plants/plants', () => {
 
   it('responds with status code 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/plants/plants').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/plants/plants').set('Authorization', login.body.access_token);
     expect(res.status).toBe(200);
   });
 
   it('responds with array of plants on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/plants/plants').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/plants/plants').set('Authorization', login.body.access_token);
     expect(res.body).toEqual(plantData);
   });
 
@@ -280,13 +280,13 @@ describe('[GET] /api/plants/plant/:plantid', () => {
 
   it('responds with status code 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/plants/plant/1').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/plants/plant/1').set('Authorization', login.body.access_token);
     expect(res.status).toBe(200);
   });
 
   it('responds with plant info on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).get('/api/plants/plant/1').set('Authorization', login.body.token);
+    const res = await request(server).get('/api/plants/plant/1').set('Authorization', login.body.access_token);
     expect(res.body).toEqual(plantData[0]);
   });
 
@@ -296,13 +296,13 @@ describe('[POST] /api/plants/plant/:userid', () => {
 
   it('responds with status code 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
+    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
     expect(res.status).toBe(200);
   });
 
   it('adds plant to plants table on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    await request(server).post('/api/plants/plant/1').set('Authorization', login.body.token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
+    await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
     const check = await db('plants').where('plantid', 3).first();
     expect(check.nickname).toBe('newPlant');
   });
@@ -313,13 +313,13 @@ describe('[PUT], /api/plants/plant/:plantid', () => {
 
   it('responds with status code 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).put('/api/plants/plant/1').set('Authorization', login.body.token).send({...plantData[0], nickname: 'newName'});
+    const res = await request(server).put('/api/plants/plant/1').set('Authorization', login.body.access_token).send({...plantData[0], nickname: 'newName'});
     expect(res.status).toBe(200);
   });
 
   it('updates plant info on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    await request(server).put('/api/plants/plant/1').set('Authorization', login.body.token).send({nickname: 'newName'});
+    await request(server).put('/api/plants/plant/1').set('Authorization', login.body.access_token).send({nickname: 'newName'});
     const check = await db('plants').where('plantid', 1).first()
     expect(check.nickname).toBe('newName');
   });
@@ -330,13 +330,13 @@ describe('[DELETE], /api/plants/plant/:plantid', () => {
 
   it('responds with status code 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).delete('/api/plants/plant/1').set('Authorization', login.body.token);
+    const res = await request(server).delete('/api/plants/plant/1').set('Authorization', login.body.access_token);
     expect(res.status).toBe(200);
   });
 
   it('deletes plant from plants table on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    await request(server).delete('/api/plants/plant/1').set('Authorization', login.body.token);
+    await request(server).delete('/api/plants/plant/1').set('Authorization', login.body.access_token);
     const check = await db('plants')
     expect(check.length).toBe(1);
   });

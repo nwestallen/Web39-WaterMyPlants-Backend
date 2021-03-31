@@ -20,8 +20,8 @@ router.post('/register', checkRegisterPayload, checkUsernameAvailability, checkP
     const hash = bcrypt.hashSync(password, 8);
     User.add({ username, password: hash, phonenumber })
       .then(user => {
-        const token = buildToken(user);
-        res.status(201).json({...user[0], token})
+        const access_token = buildToken(user);
+        res.status(201).json({...user[0], access_token})
     })
        .catch(err => res.status(500).json({ message: err.message }));
 });
@@ -31,8 +31,8 @@ router.post('/login', checkLoginPayload, checkUserExists, (req, res) => {
   User.getByUsername(username)
   .then(user => {
     if(user && bcrypt.compareSync(password, user.password)) {
-      const token = buildToken(user);
-      res.json({ message: 'successful login', token, user });
+      const access_token = buildToken(user);
+      res.json({ message: 'successful login', access_token, user });
     } else {
       res.status(401).json({ message: 'invalid credentials' });
     }
