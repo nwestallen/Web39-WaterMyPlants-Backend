@@ -2,6 +2,8 @@ const express = require('express');
 const User = require('./users-model');
 const Plant = require('../plants/plants-model');
 const { checkUserId } = require('../middleware/users-middleware');
+const { JWT_SECRET } = require('../auth/secrets');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
@@ -41,6 +43,21 @@ router.get('/user/:id/plants', checkUserId, (req, res) => {
         res.json(plants);
     })
     .catch(err => res.status(500).json({ message: err.message }));
+});
+
+router.get('/getuserinfo', (req, res) => {
+    const token = req.headers.authorization
+    if (!token) { 
+        res.status(400).json({ message: 'no access token detected, no one is logged in' })
+    } else {
+        jwt.verify(token, JWT_SECRET, (err, decoded) => {
+            if (err) {
+                res.status(401).json({ message: 'token invalid' });
+            } else {
+                res.json(decoded);
+            }
+        });
+    }
 });
 
 module.exports = router;

@@ -40,6 +40,10 @@ router.post('/login', checkLoginPayload, checkUserExists, (req, res) => {
   .catch(err => res.status(500).json({ message: err.message }));
 });
 
+router.get('/logout', (req, res) => {
+  res.json({ message: 'this endpoint does nothing'})
+});
+
 function buildToken(user) {
   const payload = {
     subject: user.user_id,
