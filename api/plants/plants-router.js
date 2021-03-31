@@ -19,8 +19,8 @@ router.get('/plant/:plantid', (req, res) => {
     .catch(err => res.status(500).json({ message: err.message }));
 });
 
-router.post('/plant', (req, res) => {
-    Plant.add(req.body)
+router.post('/plant/:userid', (req, res) => {
+    Plant.add({ ...req.body, userid: req.params })
     .then(plant => {
         res.json(plant);
     })

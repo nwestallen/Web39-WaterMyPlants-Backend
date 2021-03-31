@@ -40,7 +40,7 @@ describe('server.js', () => {
 //[GET] /api/users/user/:userid - returns user info (username, phonenumber) XX
 //[PUT] /api/user//user/:userid - updates user info (phonenumber, password) XX
 //[GET] /api/users/user/:userid/plants - returns a list of plants to authenticated user XX
-//[POST] /api/plants/plant/ - adds plant to user's plants XX
+//[POST] /api/plants/plant/:userid - adds plant to user's plants XX
 //[GET] /api/plants/plant/:plantid - returns plant by id XX
 //[GET] /api/plants/plants - get all plants (for all users) straight up all of them XX
 //[PUT] /api/plants/plant/:plantid - updates plant with given id XX
@@ -55,7 +55,7 @@ describe('[POST] /api/auth/register', () => {
 
   it('responds with username and phonenumber on success', async () => {
     const res = await request(server).post('/api/auth/register').send(newUser);
-    expect(res.body).toEqual({ username: 'ChuckTesta', phonenumber: '330-867-5309' });
+    expect(res.body.username).toEqual('ChuckTesta');
   });
 
   it('adds new user to user table on success', async () => {
@@ -200,10 +200,10 @@ describe('[PUT] /api/users/user/:id', () => {
 
   it('updates username and password on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser)
-    await request(server).put('/api/users/user/1').send({username: 'newName', password: 'test'}).set('Authorization', login.body.token);
+    await request(server).put('/api/users/user/1').send({username: 'newName'}).set('Authorization', login.body.token);
     const check = await db('users').where('userid', 1).first();
     expect(check.username).toBe('newName');
-    expect(bcrypt.compareSync('test', check.password)).toBeTruthy();
+    expect(bcrypt.compareSync('password', check.password)).toBeTruthy();
   });
 
   it('responds with status 400 if userid not found', async () => {
@@ -292,17 +292,17 @@ describe('[GET] /api/plants/plant/:plantid', () => {
 
 });
 
-describe('[POST] /api/plants/plant/', () => {
+describe('[POST] /api/plants/plant/:userid', () => {
 
   it('responds with status code 200 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).post('/api/plants/plant').set('Authorization', login.body.token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test', userid: 1 });
+    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
     expect(res.status).toBe(200);
   });
 
   it('adds plant to plants table on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    await request(server).post('/api/plants/plant').set('Authorization', login.body.token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test', userid: 1 });
+    await request(server).post('/api/plants/plant/1').set('Authorization', login.body.token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
     const check = await db('plants').where('plantid', 3).first();
     expect(check.nickname).toBe('newPlant');
   });
