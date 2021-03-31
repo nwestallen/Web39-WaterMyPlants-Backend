@@ -54,7 +54,7 @@ router.get('/getuserinfo', (req, res) => {
             if (err) {
                 res.status(401).json({ message: 'token invalid' });
             } else {
-                res.json(decoded);
+                res.json(decoded.user);
             }
         });
     }
