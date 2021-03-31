@@ -284,16 +284,22 @@ describe('[GET] /api/plants/plants', () => {
 
 describe('[GET] /api/plants/plant/:plantid', () => {
 
-  it('responds with status code 200 on success', async () => {
+  it('responds with status code 201 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
     const res = await request(server).get('/api/plants/plant/1').set('Authorization', login.body.access_token);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(201);
   });
 
   it('responds with plant info on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
     const res = await request(server).get('/api/plants/plant/1').set('Authorization', login.body.access_token);
     expect(res.body).toEqual(plantData[0]);
+  });
+
+  it('responds with 400 error if plant id does not exist', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).get('/api/plants/plant/9').set('Authorization', login.body.access_token);
+    expect(res.status).toBe(400); 
   });
 
 });
@@ -319,6 +325,18 @@ describe('[POST] /api/plants/plant/:userid', () => {
     expect(check.nickname).toBe('newPlant');
   });
 
+  it('responds with 400 error if userid does not exist', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).post('/api/plants/plant/9').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'}); 
+    expect(res.status).toBe(400);
+  });
+
+  it('responds with 400 error if required fields missing', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', species: 'test'}); 
+    expect(res.status).toBe(400);
+  });
+
 });
 
 describe('[PUT], /api/plants/plant/:plantid', () => {
@@ -342,6 +360,12 @@ describe('[PUT], /api/plants/plant/:plantid', () => {
     expect(check.nickname).toBe('newName');
   });
 
+  it('responds with 400 error if plant id does not exist', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).put('/api/plants/plant/9').set('Authorization', login.body.access_token).send({...plantData[0], nickname: 'newName'}); 
+    expect(res.status).toBe(400);
+  });
+
 });
 
 describe('[DELETE], /api/plants/plant/:plantid', () => {
@@ -357,6 +381,12 @@ describe('[DELETE], /api/plants/plant/:plantid', () => {
     await request(server).delete('/api/plants/plant/1').set('Authorization', login.body.access_token);
     const check = await db('plants')
     expect(check.length).toBe(1);
+  });
+
+  it('responds with 400 error if plant id does not exist', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).delete('/api/plants/plant/9').set('Authorization', login.body.access_token);
+    expect(res.status).toBe(400); 
   });
 
 });
