@@ -208,7 +208,7 @@ describe('[PUT] /api/users/user/:id', () => {
 
   it('responds with updated user on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).put('/api/users/user/1').send({username: 'newName'}).set('Authorization', login.body.access_token); 
+    const res = await request(server).put('/api/users/user/1').send({password: 'newpassword', username: 'newName'}).set('Authorization', login.body.access_token); 
     expect(res.body).toMatchObject({ user: { username: 'newName', phonenumber: '444-444-4444' } });
   });
 

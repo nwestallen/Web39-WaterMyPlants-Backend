@@ -24,8 +24,8 @@ const add = async user => {
 const update = async user => {
     const { userid, password } = user
     const newUser = user
-    if (password) { newUser[password] = bcrypt.hashSync(password, 8) }
-    return await db('users').where({ userid }).update(newUser, ['username', 'phonenumber']);
+    if (password) { newUser.password = bcrypt.hashSync(password, 8) }
+    return await db('users').where({ userid }).update(newUser, ['userid', 'username', 'phonenumber']);
 };
 
 module.exports = {
