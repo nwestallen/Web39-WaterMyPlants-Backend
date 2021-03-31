@@ -209,7 +209,7 @@ describe('[PUT] /api/users/user/:id', () => {
   it('responds with updated user on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
     const res = await request(server).put('/api/users/user/1').send({username: 'newName'}).set('Authorization', login.body.access_token); 
-    expect(res.body).toMatchObject({username: 'newUser', phonenumber: '444-444-4444'});
+    expect(res.body).toMatchObject({ user: { username: 'newName', phonenumber: '444-444-4444' } });
   });
 
   it('responds with status 400 if userid not found', async () => {
@@ -309,7 +309,7 @@ describe('[POST] /api/plants/plant/:userid', () => {
   it('responds with newly created plant', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
     const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'}); 
-    expect(res.body).toMatchObject({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
+    expect(res.body).toMatchObject({ nickname: 'newPlant', h2oFrequency: '2', species: 'test'});
   });
 
   it('adds plant to plants table on success', async () => {

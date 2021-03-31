@@ -25,8 +25,8 @@ router.get('/user/:id', checkUserId, (req, res) => {
 router.put('/user/:id', checkUserId, (req, res) => {
     const userid = req.params.id;
     User.update({...req.body, userid})
-    .then(() => {
-        res.json({ message: 'user info successfully updated' });
+    .then(user => {
+        res.json({ message: 'user info successfully updated', user: user[0] });
     })
     .catch(err => {
         res.status(500).json({ message: err.message })

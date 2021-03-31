@@ -22,7 +22,7 @@ router.get('/plant/:plantid', (req, res) => {
 router.post('/plant/:userid', (req, res) => {
     Plant.add({ ...req.body, userid: req.params.userid })
     .then(plant => {
-        res.json(plant);
+        res.json(plant[0]);
     })
     .catch(err => {
         res.status(500).json({ message: err.message })
@@ -34,7 +34,7 @@ router.put('/plant/:plantid', (req, res) => {
     
     Plant.update({...req.body, plantid})
     .then(plant => {
-        res.json(plant);
+        res.json(plant[0]);
     })
     .catch(err => { 
         res.status(500).json({ message: err.message })
