@@ -1,4 +1,5 @@
 const express = require('express');
+const { checkPlantExists, checkUserExists, checkPlantPayload } = require('../middleware/plants-middleware');
 const Plant = require('./plants-model');
 
 const router = express.Router()
@@ -11,7 +12,7 @@ router.get('/plants', (req, res) => {
     .catch(err => res.status(500).json({ message: err.message }));
 });
 
-router.get('/plant/:plantid', (req, res) => {
+router.get('/plant/:plantid', checkPlantExists, (req, res) => {
     Plant.getById(req.params.plantid)
     .then(plant => {
         res.json(plant);
@@ -19,17 +20,17 @@ router.get('/plant/:plantid', (req, res) => {
     .catch(err => res.status(500).json({ message: err.message }));
 });
 
-router.post('/plant/:userid', (req, res) => {
+router.post('/plant/:userid', checkUserExists, checkPlantPayload, (req, res) => {
     Plant.add({ ...req.body, userid: req.params.userid })
     .then(plant => {
-        res.json(plant[0]);
+        res.status(201).json(plant[0]);
     })
     .catch(err => {
         res.status(500).json({ message: err.message })
     });
 });
 
-router.put('/plant/:plantid', (req, res) => {
+router.put('/plant/:plantid', checkPlantExists, (req, res) => {
     const { plantid } = req.params;
     
     Plant.update({...req.body, plantid})
@@ -41,7 +42,7 @@ router.put('/plant/:plantid', (req, res) => {
     });
 });
 
-router.delete('/plant/:plantid', (req, res) => {
+router.delete('/plant/:plantid', checkPlantExists, (req, res) => {
     Plant.remove(req.params.plantid)
     .then(() => {
         res.json({ message: `plant with id ${req.params.plantid} successfully deleted`})
