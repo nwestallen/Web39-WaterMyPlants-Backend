@@ -20,7 +20,7 @@ router.get('/plant/:plantid', (req, res) => {
 });
 
 router.post('/plant/:userid', (req, res) => {
-    Plant.add({ ...req.body, userid: req.params })
+    Plant.add({ ...req.body, userid: req.params.userid })
     .then(plant => {
         res.json(plant);
     })
