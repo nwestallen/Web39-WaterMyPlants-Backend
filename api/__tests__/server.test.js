@@ -53,9 +53,9 @@ describe('[POST] /api/auth/register', () => {
     expect(res.status).toBe(201);
   });
 
-  it('responds with username and phonenumber on success', async () => {
+  it('responds with new user on success', async () => {
     const res = await request(server).post('/api/auth/register').send(newUser);
-    expect(res.body.username).toEqual('ChuckTesta');
+    expect(res.body).toMatchObject({user: {username: 'ChuckTesta', phonenumber:'330-867-5309', userid: 2} });
   });
 
   it('adds new user to user table on success', async () => {
@@ -199,11 +199,17 @@ describe('[PUT] /api/users/user/:id', () => {
   });
 
   it('updates username and password on success', async () => {
-    const login = await request(server).post('/api/auth/login').send(oldUser)
+    const login = await request(server).post('/api/auth/login').send(oldUser);
     await request(server).put('/api/users/user/1').send({username: 'newName'}).set('Authorization', login.body.access_token);
     const check = await db('users').where('userid', 1).first();
     expect(check.username).toBe('newName');
     expect(bcrypt.compareSync('password', check.password)).toBeTruthy();
+  });
+
+  it('responds with updated user on success', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).put('/api/users/user/1').send({username: 'newName'}).set('Authorization', login.body.access_token); 
+    expect(res.body).toMatchObject({username: 'newUser', phonenumber: '444-444-4444'});
   });
 
   it('responds with status 400 if userid not found', async () => {
@@ -300,6 +306,12 @@ describe('[POST] /api/plants/plant/:userid', () => {
     expect(res.status).toBe(200);
   });
 
+  it('responds with newly created plant', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'}); 
+    expect(res.body).toMatchObject({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
+  });
+
   it('adds plant to plants table on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
     await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
@@ -315,6 +327,12 @@ describe('[PUT], /api/plants/plant/:plantid', () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
     const res = await request(server).put('/api/plants/plant/1').set('Authorization', login.body.access_token).send({...plantData[0], nickname: 'newName'});
     expect(res.status).toBe(200);
+  });
+
+  it('responds with the updated plant', async () => {
+    const login = await request(server).post('/api/auth/login').send(oldUser);
+    const res = await request(server).put('/api/plants/plant/1').set('Authorization', login.body.access_token).send({...plantData[0], nickname: 'newName'}); 
+    expect(res.body).toMatchObject({"h2oFrequency": "7", "nickname": "newName", "plantid": 1, "species": "aloe vera", "userid": 1});
   });
 
   it('updates plant info on success', async () => {

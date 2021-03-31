@@ -21,7 +21,7 @@ router.post('/register', checkRegisterPayload, checkUsernameAvailability, checkP
     User.add({ username, password: hash, phonenumber })
       .then(user => {
         const access_token = buildToken(user);
-        res.status(201).json({...user[0], access_token})
+        res.status(201).json({user: user[0], access_token, message: 'successful register'})
     })
        .catch(err => res.status(500).json({ message: err.message }));
 });
