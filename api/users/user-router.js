@@ -45,8 +45,9 @@ router.get('/user/:id/plants', checkUserId, (req, res) => {
     .catch(err => res.status(500).json({ message: err.message }));
 });
 
-router.get('/getuserinfo', (req, res) => {
+router.get('/getuserinfo', async (req, res) => {
     const token = req.headers.authorization
+    console.log('getuserinfo function')
     if (!token) { 
         res.status(400).json({ message: 'no access token detected, no one is logged in' })
     } else {
@@ -54,7 +55,12 @@ router.get('/getuserinfo', (req, res) => {
             if (err) {
                 res.status(401).json({ message: 'token invalid' });
             } else {
-                res.json(decoded.user);
+                Plant.getUserPlants(decoded.user.userid)
+                .then(plants => {
+                    console.log({...decoded.user, plants })
+                    res.json({...decoded.user, plants}); 
+                })
+                .catch(err => res.status(500).json({ message: err.message }));
             }
         });
     }

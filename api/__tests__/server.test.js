@@ -390,3 +390,10 @@ describe('[DELETE], /api/plants/plant/:plantid', () => {
   });
 
 });
+
+it('getuserinfo', async () => {
+  const login = await request(server).post('/api/auth/login').send(oldUser);
+  const res = await request(server).get('/api/users/getuserinfo').set('Authorization', login.body.access_token);
+  expect(res.body).toMatchObject({ userid: 1, username: 'OldMan', phonenumber: '444-444-4444'});
+  expect(res.body).toHaveProperty('plants');
+});
