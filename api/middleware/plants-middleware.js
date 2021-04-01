@@ -28,9 +28,9 @@ const checkUserExists = (req, res, next) => {
 };
 
 const checkPlantPayload = (req, res, next) => {
-    const { nickname, species, h2oFrequency } = req.body;
-    if ( !nickname || !species || !h2oFrequency ) {
-        res.status(400).json({ message: 'nickname, species, and h2oFrequency fields are required'});
+    const { nickname, species, h2ofrequency } = req.body;
+    if ( !nickname || !species || !h2ofrequency ) {
+        res.status(400).json({ message: 'nickname, species, and h2ofrequency fields are required'});
     } else {
         next()
     }

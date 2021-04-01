@@ -11,7 +11,7 @@ exports.up = async (knex) => {
       plants.increments('plantid')
       plants.string('nickname', 200).notNullable()
       plants.string('species', 200).notNullable()
-      plants.string('h2oFrequency', 200).notNullable()
+      plants.string('h2ofrequency', 200).notNullable()
       plants.integer('userid')
         .unsigned()
         .references('userid')

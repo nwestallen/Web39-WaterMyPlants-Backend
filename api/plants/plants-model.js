@@ -13,12 +13,12 @@ const getUserPlants = (userid) => {
 };
 
 const add = plant => {
-    return db('plants').insert(plant, ['nickname', 'h2oFrequency', 'species', 'plantid', 'userid']);
+    return db('plants').insert(plant, ['nickname', 'h2ofrequency', 'species', 'plantid', 'userid']);
 };
 
 const update = plant => {
     const { plantid } = plant
-    return db('plants').where({ plantid }).update(plant, ['nickname', 'plantid', 'h2oFrequency', 'species', 'userid']);
+    return db('plants').where({ plantid }).update(plant, ['nickname', 'plantid', 'h2ofrequency', 'species', 'userid']);
 };
 
 const remove = plantid => {

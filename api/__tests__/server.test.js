@@ -6,8 +6,8 @@ const bcrypt = require('bcryptjs')
 const newUser = {username: 'ChuckTesta', password: '1234', phonenumber: '330-867-5309'}
 const oldUser = {username: 'OldMan', password: 'password', phonenumber: '444-444-4444'}
 const plantData = [
-  {"h2oFrequency": "7", "nickname": "steve", "plantid": 1, "species": "aloe vera", "userid": 1}, 
-  {"h2oFrequency": "4", "nickname": "rubber plant", "plantid": 2, "species": "ficus elastica", "userid": 1}
+  {"h2ofrequency": "7", "nickname": "steve", "plantid": 1, "species": "aloe vera", "userid": 1}, 
+  {"h2ofrequency": "4", "nickname": "rubber plant", "plantid": 2, "species": "ficus elastica", "userid": 1}
 ]
 
 beforeAll(async () => {
@@ -308,26 +308,26 @@ describe('[POST] /api/plants/plant/:userid', () => {
 
   it('responds with status code 201 on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
+    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2ofrequency: 2, species: 'test'});
     expect(res.status).toBe(201);
   });
 
   it('responds with newly created plant', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'}); 
-    expect(res.body).toMatchObject({ nickname: 'newPlant', h2oFrequency: '2', species: 'test'});
+    const res = await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2ofrequency: 2, species: 'test'}); 
+    expect(res.body).toMatchObject({ nickname: 'newPlant', h2ofrequency: '2', species: 'test'});
   });
 
   it('adds plant to plants table on success', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'});
+    await request(server).post('/api/plants/plant/1').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2ofrequency: 2, species: 'test'});
     const check = await db('plants').where('plantid', 3).first();
     expect(check.nickname).toBe('newPlant');
   });
 
   it('responds with 400 error if userid does not exist', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
-    const res = await request(server).post('/api/plants/plant/9').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2oFrequency: 2, species: 'test'}); 
+    const res = await request(server).post('/api/plants/plant/9').set('Authorization', login.body.access_token).send({ nickname: 'newPlant', h2ofrequency: 2, species: 'test'}); 
     expect(res.status).toBe(400);
   });
 
@@ -350,7 +350,7 @@ describe('[PUT], /api/plants/plant/:plantid', () => {
   it('responds with the updated plant', async () => {
     const login = await request(server).post('/api/auth/login').send(oldUser);
     const res = await request(server).put('/api/plants/plant/1').set('Authorization', login.body.access_token).send({...plantData[0], nickname: 'newName'}); 
-    expect(res.body).toMatchObject({"h2oFrequency": "7", "nickname": "newName", "plantid": 1, "species": "aloe vera", "userid": 1});
+    expect(res.body).toMatchObject({"h2ofrequency": "7", "nickname": "newName", "plantid": 1, "species": "aloe vera", "userid": 1});
   });
 
   it('updates plant info on success', async () => {
