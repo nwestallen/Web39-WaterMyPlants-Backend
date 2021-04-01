@@ -20,7 +20,8 @@ router.post('/register', checkRegisterPayload, checkUsernameAvailability, checkP
     const hash = bcrypt.hashSync(password, 8);
     User.add({ username, password: hash, phonenumber })
       .then(user => {
-        const access_token = buildToken(user);
+        //console.log(user[0])
+        const access_token = buildToken(user[0]);
         res.status(201).json({user: user[0], access_token, message: 'successful register'})
     })
        .catch(err => res.status(500).json({ message: err.message }));
@@ -30,6 +31,7 @@ router.post('/login', checkLoginPayload, checkUserExists, (req, res) => {
   const { username, password } = req.body;
   User.getByUsername(username)
   .then(user => {
+    //console.log(user)
     if(user && bcrypt.compareSync(password, user.password)) {
       const access_token = buildToken(user);
       res.json({ message: 'successful login', access_token, user });
