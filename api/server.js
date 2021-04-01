@@ -12,8 +12,8 @@ server.use(express.json())
 server.use(helmet())
 server.use(cors())
 
-server.use('/api/auth', authRouter);
 server.use('/api/users', restrict, usersRouter);
 server.use('/api/plants', restrict, plantsRouter);
+server.use(authRouter);
 
 module.exports = server

@@ -15,7 +15,7 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
-router.post('/register', checkRegisterPayload, checkUsernameAvailability, checkPhoneAvailability, (req, res) => {
+router.post('/createnewuser', checkRegisterPayload, checkUsernameAvailability, checkPhoneAvailability, (req, res) => {
     const { username, password, phonenumber } = req.body;
     const hash = bcrypt.hashSync(password, 8);
     User.add({ username, password: hash, phonenumber })
